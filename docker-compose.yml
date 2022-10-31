@@ -5,7 +5,7 @@ services:
     build:
       context: .
       args:
-        - DEV=true
+        - DEV=True
     ports:
       - "5000:5000"
     volumes:
