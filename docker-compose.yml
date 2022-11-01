@@ -15,7 +15,7 @@ services:
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:5000"
     environment:
-      - BD_HOST=db
+      - DB_HOST=db
       - DB_NAME=devdb
       - DB_USER=devuser
       - DB_PASS=changeme
