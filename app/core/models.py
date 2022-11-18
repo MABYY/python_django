@@ -66,6 +66,7 @@ class Recipe(models.Model): ## basic class provided by Django
     price = models.DecimalField(max_digits=5, decimal_places=2)
     link = models.CharField(max_length=255,blank=True)
     tags = models.ManyToManyField('Tag') 
+    ingredients=models.ManyToManyField('Ingredient') 
     # we can have many recipies with many tags each
     
     def __str__(self):  ## it displays the title when listing things in the django admin 
@@ -82,6 +83,17 @@ class Tag(models.Model):
     
     def __str__(self):
         return self.name
+
+class Ingredient(models.Model):
+    '''Ingredient for recipes.'''
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    def __str__(self): # string representation
+        return self.name
+    
 ## class UserManager:
 
 # Since usermanager is assoicated to a model we need a way to access it.

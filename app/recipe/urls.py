@@ -12,10 +12,12 @@ from recipe import views
 
  # default router provided by Djando
 router = DefaultRouter() 
-# use the defalt router together with views to create 
+# use the default router together with views to create 
 router.register('recipes', views.RecipeViewSet) 
 # routes for all the options available for that view
 router.register('tags', views.TagViewSet) 
+# 
+router.register('ingredients', views.IngredientViewSet) 
 
 app_name = 'recipe'
 
