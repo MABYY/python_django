@@ -42,4 +42,6 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     
-admin.site.register(models.User, UserAdmin)
+admin.site.register(models.User, UserAdmin) ## Customed user model
+admin.site.register(models.Recipe)         ## The statdard model is enough
+admin.site.register(models.Tag)
