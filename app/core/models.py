@@ -2,6 +2,8 @@
 # Database models 
 # '''
 
+from django.conf import settings
+
 from email.policy import default
 from enum import unique
 from unicodedata import name
@@ -12,12 +14,11 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
-from django.conf import settings
 
 class UserManager(BaseUserManager):
     '''Manager for users.'''
     
-    def create_user(self,email,password=None, **extra_fields): 
+    def create_user(self, email, password=None, **extra_fields): 
         ''' Create, dave and return a new user. '''    
         if not email:
             raise ValueError('User must have an email address.')        
@@ -33,28 +34,30 @@ class UserManager(BaseUserManager):
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
-        user.save(using=self.db)
+        user.save(using=self._db)
         
         return user
     
     
 class User(AbstractBaseUser, PermissionsMixin):
-    ''' User un system.'''
-    email = models.EmailField(max_length=255,unique=True)
+    ''' User in the system.'''
+    email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     
-    objects = UserManager() 
-    
-    USERNAME_FIELD = 'email' 
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+
+ 
     
 
 class Recipe(models.Model): ## basic class provided by Django   
     '''Recipe object.'''
     user = models.ForeignKey(  ## it stores the user it belongs to 
         settings.AUTH_USER_MODEL,
-        on_delete = models.CASCADE 
+        on_delete = models.CASCADE,
     )
     
     title = models.CharField(max_length = 255)
@@ -62,7 +65,8 @@ class Recipe(models.Model): ## basic class provided by Django
     time_minutes = models.IntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     link = models.CharField(max_length=255,blank=True)
-    tags = models.ManyToManyField('Tag') # we can have many recipies with many tags each
+    tags = models.ManyToManyField('Tag') 
+    # we can have many recipies with many tags each
     
     def __str__(self):  ## it displays the title when listing things in the django admin 
         return self.title

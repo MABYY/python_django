@@ -29,7 +29,7 @@ class PublicUserApiTests(TestCase):
         payload = {
             'email': 'test@example.com',
             'password' : 'testpass123',
-            'name' : 'Test name',
+            'name' : 'Test Name',
         }
         
         res = self.client.post(CREATE_USER_URL,payload) # post request to out url
@@ -42,17 +42,17 @@ class PublicUserApiTests(TestCase):
         
         self.assertNotIn('password',res.data) # password is not part of the data response
 
-    def test_user_with_email_exixts_error(self):
+    def test_user_with_email_exists_error(self):
         '''Test error returned if user with email exits.'''
         
         payload = {
             'email': 'test@example.com',
             'password' : 'testpass123',
-            'name' : 'Test name',
+            'name' : 'Test Name',
         }
         
         create_user(**payload) # create new user 
-        res = self.client.post(CREATE_USER_URL,payload) # post request to try create a another new user with existing email
+        res = self.client.post(CREATE_USER_URL, payload) # post request to try create a another new user with existing email
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST) # assertion the user already exists
  
     def test_password_too_short_error(self):
@@ -61,13 +61,14 @@ class PublicUserApiTests(TestCase):
         payload = {
             'email': 'test@example.com',
             'password' : 'pw',
-            'name' : 'Test name',
+            'name' : 'Test Name',
         }
         
         res = self.client.post(CREATE_USER_URL,payload) 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST) 
         
-        user_exists = get_user_model().objects.filter( email=payload['email']).exists() # try filtering the client
+        user_exists = get_user_model().objects.filter( 
+            email=payload['email']).exists() # try filtering the client
         self.assertFalse(user_exists)
  
  
@@ -89,8 +90,6 @@ class PublicUserApiTests(TestCase):
         
         res = self.client.post(TOKEN_URL, payload)
         
-        # print('########## RES############')
-        # print(res)
         self.assertIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         
@@ -131,7 +130,7 @@ class PrivateUserApiTests(TestCase):
         self.user = create_user(
             email = 'test@example.com',
             password = 'testpass123',
-            name = 'Test name',          
+            name = 'Test Name',          
         )        
         
         self.client = APIClient() 
