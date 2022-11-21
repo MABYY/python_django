@@ -2,6 +2,9 @@
 # Database models 
 # '''
 
+import uuid
+import os
+
 from django.conf import settings
 
 from email.policy import default
@@ -14,6 +17,12 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
+def recipe_image_file_path(instance, filename):
+    '''Generate file path for new recipe image.'''
+    ext = os.path.splitext(filename)[1]  # extract the extension of the pathname
+    filename = f'{uuid.uuid4()}{ext}'    # create new filename using the previous extension
+    
+    return os.path.join('uploads', 'recipe', filename) # generate the path ensuring the format of the os we are working on
 
 class UserManager(BaseUserManager):
     '''Manager for users.'''
@@ -67,6 +76,7 @@ class Recipe(models.Model): ## basic class provided by Django
     link = models.CharField(max_length=255,blank=True)
     tags = models.ManyToManyField('Tag') 
     ingredients=models.ManyToManyField('Ingredient') 
+    image = models.ImageField(null=True, upload_to=recipe_image_file_path) # pass the upload function, don't execute it
     # we can have many recipies with many tags each
     
     def __str__(self):  ## it displays the title when listing things in the django admin 
