@@ -27,7 +27,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for recipes."""
-    tags = TagSerializer(many=True, required=False)
+    tags = TagSerializer(many=True, required=False) #nested serializer / READ-ONLY
     ingredients = IngredientSerializer(many=True, required=False)
 
     class Meta:
@@ -36,15 +36,15 @@ class RecipeSerializer(serializers.ModelSerializer):
             'id', 'title', 'time_minutes', 'price', 'link', 'tags',
             'ingredients',
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id'] # read only id field
         
     def _get_or_create_tags(self, tags, recipe):
         """Handle getting or creating tags as needed."""
         auth_user = self.context['request'].user
         for tag in tags:
-            tag_obj, created = Tag.objects.get_or_create(
-                user=auth_user,
-                **tag,
+            tag_obj, created = Tag.objects.get_or_create( 
+                user=auth_user, #prevent duplicates
+                **tag, 
             )
             recipe.tags.add(tag_obj)
                    
@@ -62,8 +62,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         '''Create a recipe.'''       # key correctly   
         tags = validated_data.pop('tags', []) 
         ingredients = validated_data.pop('ingredients', [])
-        # removes tags if found in validated data
-        # assign it to the tags variable
                                              
         recipe = Recipe.objects.create(**validated_data)
         self._get_or_create_tags(tags, recipe)
@@ -98,10 +96,11 @@ class RecipeDetailSerializer(RecipeSerializer):
         
         
 class RecipeImageSerializer(serializers.ModelSerializer):
-    """Serializer for uploading images to recipes."""
+    """Serializer for uploading images to recipes. 
+        Create unique api to handle image upload."""
 
     class Meta:
         model = Recipe
         fields = ['id','image' ]
         read_only_fields = ['id']
-        extra_kwards = {'image': {'required': 'True'}}
+        extra_kwards = {'image': {'required': 'True'}} # make image required

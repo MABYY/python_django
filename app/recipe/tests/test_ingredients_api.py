@@ -20,9 +20,9 @@ from recipe.serializers import IngredientSerializer
 
 INGREDIENTS_URL = reverse('recipe:ingredient-list')
 
-def create_user(email='user@example.com', password='testpass123'):
+def create_user(email='user@example.com', name='Test User', password='testpass123'):
     '''Create and return a user.'''
-    return get_user_model().objects.create_user(email=email, password=password)
+    return get_user_model().objects.create_user(email=email, name=name, password=password)
 
 def detail_url(ingredient_id):
     '''Create and return an ingredient detail URL.'''

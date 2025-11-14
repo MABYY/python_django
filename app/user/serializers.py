@@ -11,6 +11,9 @@ from django.utils.translation import gettext as _ # common syntax to do the tran
 
 from rest_framework import serializers
 
+# class HellloSerializer(serializers.Serializer):
+#     name = serializers.CharField(max_length=10)    
+    
 class UserSerializer(serializers.ModelSerializer):
     '''Serializer for the user object.'''
     class Meta:        
@@ -22,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         '''Create and return a user with encrypted password.'''
         return get_user_model().objects.create_user(**validated_data)
     
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data): # prevent the password from being plain text
         '''Update and return user.'''
         password = validated_data.pop('password', None)
         user = super().update(instance, validated_data)
@@ -33,8 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
         
         return user
     
-    
-class AuthTokenSerializer(serializers.Serializer):
+class AuthTokenSerializer(serializers.Serializer): # Not a model serializer
     '''Serializer for the user auth token.'''
     email = serializers.EmailField()
     password = serializers.CharField(
@@ -56,5 +58,6 @@ class AuthTokenSerializer(serializers.Serializer):
             msg = _('Unable to authenticate with provided credentials.')
             raise serializers.ValidationError(msg, code='authorization')
             
-        attrs['user'] = user
+        attrs['user'] = user # This will be used in the view
         return attrs
+    

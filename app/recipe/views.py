@@ -45,10 +45,22 @@ from recipe import serializers
     )
 )
 
-class RecipeViewSet(viewsets.ModelViewSet):
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'assigned_only',
+                OpenApiTypes.INT, enum=[0, 1],
+                description='Filter by items assigned to recipes.',
+            ),
+        ]
+    )
+)
+
+class RecipeViewSet(viewsets.ModelViewSet): # ModelViewSet works directly with models
     '''View for manage recipe APIs.'''
     serializer_class = serializers.RecipeDetailSerializer
-    queryset = Recipe.objects.all() # Objects avalilable for this viewset
+    queryset = Recipe.objects.all() # Specify the queryset/models to be used
     
     authentication_classes = [TokenAuthentication] # In order to use any of the endpoints provided by this viewset
     permission_classes = [IsAuthenticated] # you need to use tokenAuth and you need to be authenticated
@@ -60,10 +72,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         '''Convert a list of strings to integers.'''  
         return [int(str_id) for str_id in qs.split(',')]
     
-    
   
-    def get_queryset(self):
-        """Retrieve recipes for authenticated user."""
+    def get_queryset(self): 
+        """Retrieve recipes for authenticated user. Ovrewrite to filter by tags/ingredients."""
         tags = self.request.query_params.get('tags')
         ingredients = self.request.query_params.get('ingredients')
         queryset = self.queryset
@@ -78,12 +89,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             user=self.request.user
         ).order_by('-id').distinct()
     
-        #return self.queryset.filter(user=self.request.user).order_by('-id')
-    
     # Overwrite the get_serializer_class() used by django by default to
     # determine the class being used for a paarticular action
     
-    def get_serializer_class(self):
+    def get_serializer_class(self): # When using ModelViewSet, DRF provides default action mappings, ie list, upload_image
         '''Return the serializer class for request.'''
         
         if self.action == 'list':
@@ -104,26 +113,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    
-        
-             
-    def perform_create(self, serializer):
+            
+    def perform_create(self, serializer): #overwrite recipe create of viewset to set the user field
         '''Create a new recipe.'''
         '''Overwrite the behavior for when Djando saves 
             a model in a viewset'''
-        serializer.save(user=self.request.user)
-
-@extend_schema_view(
-    list=extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'assigned_only',
-                OpenApiTypes.INT, enum=[0, 1],
-                description='Filter by items assigned to recipes.',
-            ),
-        ]
-    )
-)
+        serializer.save(user=self.request.user)    
 
 class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
                             mixins.UpdateModelMixin,
@@ -148,34 +143,33 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
         return queryset.filter(
             user=self.request.user
         ).order_by('-name').distinct()
-
-
     
-class TagViewSet(mixins.DestroyModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.ListModelMixin, 
-                 viewsets.GenericViewSet):  # Add listing functionality for listin models
-    
-    '''Manage tags in the database.'''
-    serializer_class = serializers.TagSerializer
-    queryset = Tag.objects.all()
-    authentication_classes = [TokenAuthentication] # In order to use any of the endpoints provided by this viewset
-    permission_classes = [IsAuthenticated] # you need to use tokenAuth and you need to be authenticated
-
-    def get_queryset(self):
-        '''Filter queryset to authenticated user nad order by name.'''
-        return self.queryset.filter(user=self.request.user).order_by('-name')
-
 class TagViewSet(BaseRecipeAttrViewSet):
     """Manage tags in the database."""
     serializer_class = serializers.TagSerializer
     queryset = Tag.objects.all()
 
-
 class IngredientViewSet(BaseRecipeAttrViewSet):
     """Manage ingredients in the database."""
     serializer_class = serializers.IngredientSerializer
     queryset = Ingredient.objects.all()
+
+
+# class TagViewSet(mixins.DestroyModelMixin, # Implement delete and update functionality
+#                  mixins.UpdateModelMixin,
+#                  mixins.ListModelMixin, 
+#                  viewsets.GenericViewSet):  # Add listing functionality for listin models
+    
+#     '''Manage tags in the database.'''
+#     serializer_class = serializers.TagSerializer
+#     queryset = Tag.objects.all()
+#     authentication_classes = [TokenAuthentication] # In order to use any of the endpoints provided by this viewset
+#     permission_classes = [IsAuthenticated] # you need to use tokenAuth and you need to be authenticated
+
+#     def get_queryset(self):
+#         '''Filter queryset to authenticated user nad order by name.'''
+#         return self.queryset.filter(user=self.request.user).order_by('-name')
+
     
 # class IngredientViewSet(mixins.DestroyModelMixin,
 #                         mixins.UpdateModelMixin,

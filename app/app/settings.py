@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    'rest_framework',
+    # Django apps added to the prject
+    'rest_framework',  
     'rest_framework.authtoken',
     'drf_spectacular',
     'core',
@@ -147,6 +148,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+# DRF Spectacular settings
 SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST':True,
 }

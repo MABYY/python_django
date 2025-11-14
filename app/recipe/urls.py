@@ -10,13 +10,14 @@ from django.urls import (
 from rest_framework.routers import DefaultRouter
 from recipe import views
 
- # default router provided by Djando
-router = DefaultRouter() 
-# use the default router together with views to create 
-router.register('recipes', views.RecipeViewSet) 
+# Default router provided by Django
+# Use the default router together with views to create 
 # routes for all the options available for that view
+
+router = DefaultRouter() 
+
+router.register('recipes', views.RecipeViewSet) 
 router.register('tags', views.TagViewSet) 
-# 
 router.register('ingredients', views.IngredientViewSet) 
 
 app_name = 'recipe'
